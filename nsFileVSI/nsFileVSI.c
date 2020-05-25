@@ -62,7 +62,7 @@ BOOL getProductVersion(LPCTSTR lpszFileName, TCHAR* pszOutputBuffer, DWORD dwOut
         nVer[1] = LOWORD(pFileInfo->dwProductVersionMS);
         nVer[2] = HIWORD(pFileInfo->dwProductVersionLS);
         nVer[3] = LOWORD(pFileInfo->dwProductVersionLS);
-        wsprintfA(pszOutputBuffer, _T("%d.%d.%d.%d"), nVer[0], nVer[1], nVer[2], nVer[3]);
+        wsprintf(pszOutputBuffer, _T("%d.%d.%d.%d"), nVer[0], nVer[1], nVer[2], nVer[3]);
 
         GlobalUnlock(hMem);
         GlobalFree(hMem);
@@ -88,9 +88,9 @@ extern "C" {
         // and the second time would give you read.txt. 
         // you should empty the stack of your parameters, and ONLY your
         // parameters.
-        char fileName[256];
-        char fullPath[2048];
-        char pszVersion[256] = { 0 };
+        TCHAR fileName[256];
+        TCHAR fullPath[2048];
+        TCHAR pszVersion[256];
         int arch = 0;
         BOOL x64os = FALSE;
         BOOL ok = TRUE;
@@ -99,34 +99,34 @@ extern "C" {
         EXDLL_INIT();
         // g_hwndParent = hwndParent;
 
-        PopStringA(fileName);
+        popstring(fileName);
         arch = popint();
 
-        GetEnvironmentVariable("WINDIR", fullPath, sizeof(fullPath));
+        GetEnvironmentVariable(_TEXT("WINDIR"), fullPath, sizeof(fullPath));
 
         x64os = isWOW64();
 
         if ((x64os && arch == 0x64) || (!x64os && arch == 0x86)) {
-            lstrcatA(fullPath, "\\System32\\");
+            lstrcat(fullPath, _TEXT("\\System32\\"));
         }
         else if (x64os && arch == 0x86) {
-            lstrcatA(fullPath, "\\SysWOW64\\");
+            lstrcat(fullPath, _TEXT("\\SysWOW64\\"));
         }
         else { // Invalid
             ok = FALSE;
         }
 
         if (ok) {
-            lstrcatA(fullPath, fileName);
-            Wow64DisableWow64FsRedirection(OldValue);
+            lstrcat(fullPath, fileName);
+            Wow64DisableWow64FsRedirection(&OldValue);
             ok = getProductVersion(fullPath, pszVersion, sizeof(pszVersion));
             if (OldValue)
                 Wow64RevertWow64FsRedirection(OldValue);
         }
         if (ok)
-            PushStringA(pszVersion);
+            pushstring(pszVersion);
         else
-            PushStringA("failed");
+            pushstring(_TEXT("failed"));
     }
 
     void __declspec(dllexport) IsX64OperatingSystem(HWND hwndParent, int string_size,
