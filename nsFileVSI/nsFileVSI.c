@@ -7,7 +7,11 @@
 
 #if defined(_DEBUG)
 #pragma comment(lib, "Version.lib")
+#if !defined(UNICODE)
 #pragma comment(lib, "nsis/pluginapi-x86-ansi.lib")
+#else
+#pragma comment(lib, "nsis/pluginapi-x86-unicode.lib")
+#endif
 #endif
 
 typedef BOOL(WINAPI* LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
