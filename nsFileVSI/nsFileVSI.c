@@ -1,17 +1,12 @@
 // nsFileVSI.cpp : Defines the exported functions for the DLL application.
-// V1.1
-
+// V1.2
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
 #include "nsis/pluginapi.h" // nsis plugin
 
 #if defined(_DEBUG)
 #pragma comment(lib, "Version.lib")
-#if !defined(UNICODE)
-#pragma comment(lib, "nsis/pluginapi-x86-ansi.lib")
-#else
-#pragma comment(lib, "nsis/pluginapi-x86-unicode.lib")
-#endif
 #endif
 
 typedef BOOL(WINAPI* LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
@@ -93,7 +88,7 @@ extern "C" {
         // you should empty the stack of your parameters, and ONLY your
         // parameters.
         TCHAR fileName[256];
-        TCHAR fullPath[2048];
+        TCHAR fullPath[MAX_PATH];
         TCHAR pszVersion[256];
         int arch = 0;
         BOOL x64os = FALSE;
